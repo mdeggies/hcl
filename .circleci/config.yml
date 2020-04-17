@@ -49,6 +49,7 @@ jobs:
     parameters:
       go-version:
         type: string
+    working_directory: ~/go/src/github.com/hashicorp/hcl
     steps:
       - checkout
       - run: go mod verify
@@ -77,7 +78,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - linux_cov_*.part
+            - /tmp/test-results/linux_cov_*.part
 
       - store_test_results:
           path: *TEST_RESULTS_DIR
@@ -152,7 +153,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - win_cov_*.part
+            - c:\Users\circleci\AppData\Local\Temp\test-results\win_cov_*.part
 
       - store_test_results:
           path: *WIN_TEST_RESULTS
