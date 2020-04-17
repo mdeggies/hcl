@@ -9,7 +9,7 @@ references:
     GO111MODULE: "on"
     GOPROXY: https://proxy.golang.org/
     TEST_RESULTS_DIR: &TEST_RESULTS_DIR /tmp/test-results
-    WIN_TEST_RESULTS: &WIN_TEST_RESULTS c:\Users\circleci\AppData\Local\Temp\test-results
+    # WIN_TEST_RESULTS: &WIN_TEST_RESULTS c:\Users\circleci\AppData\Local\Temp\test-results
 
 commands:
   git-verify:
@@ -38,7 +38,7 @@ commands:
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             echo "Running $(echo $PACKAGE_NAMES | wc -w) packages"
             echo $PACKAGE_NAMES
-            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.platform >>_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
+            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/hcl/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.platform >>_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
         
 jobs:
   go-checks:
@@ -67,7 +67,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: mkdir -p $TEST_RESULTS_DIR
+      - run: mkdir -p $TEST_RESULTS_DIR/hcl
       - run-gotests:
           cmd: "gotestsum"
           platform: "linux"
@@ -154,9 +154,9 @@ jobs:
             - win_cov_*.part
 
       - store_test_results:
-          path: *WIN_TEST_RESULTS
+          path: *TEST_RESULTS_DIR
       - store_artifacts:
-          path: *WIN_TEST_RESULTS
+          path: *TEST_RESULTS_DIR
           
 workflows:
   hcl:
