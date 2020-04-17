@@ -7,7 +7,7 @@ references:
   paths:
     test-results: &TEST_RESULTS /tmp/test-results
     win-test-results: &WIN_TEST_RESULTS c:\Users\circleci\AppData\Local\Temp\test-results
-    win-go-dir: &WIN_WORKING_DIR c:\gopath\src\github.com\hashicorp\go-getter
+    win-go-dir: &WIN_WORKING_DIR c:\gopath\src\github.com\hashicorp\hcl
     win-gomod-dir: &WIN_GOMOD_DIR c:\Windows\system32\config\systemprofile\go\pkg\mod
   environment: &ENVIRONMENT
     GOMAXPROCS: 4
