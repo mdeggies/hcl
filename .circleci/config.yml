@@ -58,6 +58,7 @@ jobs:
   linux-tests:
     docker:
       - image: circleci/golang:<< parameters.go-version >>
+    parallelism: 4
     environment: 
       <<: *ENVIRONMENT
     parameters:
@@ -72,7 +73,7 @@ jobs:
           cmd: "gotestsum"
           platform: "linux"
 
-      # save coverage report parts
+      # Save coverage report parts
       - persist_to_workspace:
           root: .
           paths:
@@ -87,6 +88,7 @@ jobs:
     executor: 
       name: win/default
       shell: bash --login -eo pipefail
+    parallelism: 4
     environment:
       <<: *ENVIRONMENT
     working_directory: c:\gopath\src\github.com\hashicorp\hcl
@@ -100,7 +102,6 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - git-verify
       - run: 
           name: Setup (remove pre-installed go v1.12)
           command: |
@@ -109,8 +110,8 @@ jobs:
 
       - restore_cache:
           keys:
-            - win-golang-<< parameters.go-version >>-cache-v1x
-            - win-gomod-cache-{{ checksum "go.mod" }}-v1x
+            - win-golang-<< parameters.go-version >>-cache-v1
+            - win-gomod-cache-{{ checksum "go.mod" }}-v1
 
       - run: 
           name: Install go version << parameters.go-version >>
@@ -128,12 +129,12 @@ jobs:
             go mod download
   
       - save_cache:
-          key: win-golang-<< parameters.go-version >>-cache-v1x
+          key: win-golang-<< parameters.go-version >>-cache-v1
           paths:
             - /go
 
       - save_cache:
-          key: win-gomod-cache-{{ checksum "go.mod" }}-v1x
+          key: win-gomod-cache-{{ checksum "go.mod" }}-v1
           paths:
             - c:\Windows\system32\config\systemprofile\go\pkg\mod
 
@@ -147,7 +148,7 @@ jobs:
           cmd: "./gotestsum.exe"
           platform: "win"
 
-      # save coverage report parts
+      # Save coverage report parts
       - persist_to_workspace:
           root: .
           paths:
@@ -162,11 +163,15 @@ workflows:
   hcl:
     jobs:
       - linux-tests:
+          requires:
+            - go-checks
           matrix:
             parameters:
               go-version: ["1.14"]
           name: linux-test-go-<< matrix.go-version >>
       - win-tests:
+          requires:
+            - go-checks
           matrix:
             parameters:
               go-version: ["1.14"]
