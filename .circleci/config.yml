@@ -4,19 +4,12 @@ orbs:
   win: circleci/windows@2.2.0
 
 references:
-  paths:
-    test-results: &TEST_RESULTS /tmp/test-results
-    win-test-results: &WIN_TEST_RESULTS c:\Users\circleci\AppData\Local\Temp\test-results
-    win-go-dir: &WIN_WORKING_DIR c:\gopath\src\github.com\hashicorp\hcl
-    win-gomod-dir: &WIN_GOMOD_DIR c:\Windows\system32\config\systemprofile\go\pkg\mod
   environment: &ENVIRONMENT
     GOMAXPROCS: 4
     GO111MODULE: "on"
     GOPROXY: https://proxy.golang.org/
     TEST_RESULTS_DIR: &TEST_RESULTS_DIR /tmp/test-results/hcl
-    WIN_TEST_RESULTS: *WIN_TEST_RESULTS
-    WIN_WORKING_DIR: *WIN_WORKING_DIR
-    WIN_GOMOD_DIR: *WIN_GOMOD_DIR
+    WIN_TEST_RESULTS: &WIN_TEST_RESULTS c:\Users\circleci\AppData\Local\Temp\test-results
 
 commands:
   git-verify:
@@ -36,7 +29,7 @@ commands:
     parameters:
       cmd:
         type: string
-      prefix:
+      platform:
         type: string
     steps:
       - run:
@@ -45,7 +38,7 @@ commands:
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             echo "Running $(echo $PACKAGE_NAMES | wc -w) packages"
             echo $PACKAGE_NAMES
-            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.prefix >>_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
+            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.platform >>_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
         
 jobs:
   go-checks:
@@ -77,7 +70,7 @@ jobs:
       - run: mkdir -p $TEST_RESULTS_DIR
       - run-gotests:
           cmd: "gotestsum"
-          prefix: "linux"
+          platform: "linux"
 
       # save coverage report parts
       - persist_to_workspace:
@@ -96,7 +89,7 @@ jobs:
       shell: bash --login -eo pipefail
     environment:
       <<: *ENVIRONMENT
-    working_directory: *WIN_WORKING_DIR
+    working_directory: c:\gopath\src\github.com\hashicorp\hcl
     parameters:
       go-version:
         type: string
@@ -142,7 +135,7 @@ jobs:
       - save_cache:
           key: windows-gomod-cache-{{ checksum "go.mod" }}
           paths:
-            - *WIN_GOMOD_DIR
+            - c:\Windows\system32\config\systemprofile\go\pkg\mod
 
       - run:
           name: Install gotestsum
@@ -152,7 +145,7 @@ jobs:
 
       - run-gotests:
           cmd: "./gotestsum.exe"
-          prefix: "win"
+          platform: "win"
 
       # save coverage report parts
       - persist_to_workspace:
