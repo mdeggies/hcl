@@ -38,7 +38,7 @@ commands:
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             echo "Running $(echo $PACKAGE_NAMES | wc -w) packages"
             echo $PACKAGE_NAMES
-            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/hcl/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.platform >>_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
+            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.platform >>_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
         
 jobs:
   go-checks:
@@ -67,7 +67,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: mkdir -p $TEST_RESULTS_DIR/hcl
+      - run: mkdir -p $TEST_RESULTS_DIR
       - run-gotests:
           cmd: "gotestsum"
           platform: "linux"
@@ -105,12 +105,12 @@ jobs:
           name: Setup (remove pre-installed go v1.12)
           command: |
             rm -rf "c:\Go"
-            mkdir -p $TEST_RESULTS_DIR
+            mkdir -p $TEST_RESULTS_DIR/hcl
 
       - restore_cache:
           keys:
-            - window-golang-<< parameters.go-version >>-cache
-            - window-gomod-cache-{{ checksum "go.mod" }}
+            - windows-golang-<< parameters.go-version >>-cachex
+            - windows-gomod-cache-{{ checksum "go.mod" }}x
 
       - run: 
           name: Install go version << parameters.go-version >>
@@ -128,12 +128,12 @@ jobs:
             go mod download
   
       - save_cache:
-          key: window-golang-<< parameters.go-version >>-cache
+          key: windows-golang-<< parameters.go-version >>-cachex
           paths:
             - /go
 
       - save_cache:
-          key: window-gomod-cache-{{ checksum "go.mod" }}
+          key: windows-gomod-cache-{{ checksum "go.mod" }}x
           paths:
             - c:\Windows\system32\config\systemprofile\go\pkg\mod
 
