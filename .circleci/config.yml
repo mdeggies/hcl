@@ -105,8 +105,8 @@ jobs:
     steps: 
       - run: git config --global core.autocrlf false
       - checkout
-      # - attach_workspace:
-      #     at: .
+      - attach_workspace:
+          at: .
       - git-verify
       - run: 
           name: Setup (remove pre-installed go v1.12)
@@ -129,8 +129,12 @@ jobs:
             fi
 
       - run: 
-          command: go mod download
-
+          name: Run verification steps
+          command: |
+            make fmt
+            go mod verify
+            go mod download
+  
       - save_cache:
           key: windows-golang-<< parameters.go-version >>-cache
           paths:
@@ -152,10 +156,10 @@ jobs:
           prefix: "win"
 
       # save coverage report parts
-      # - persist_to_workspace:
-      #     root: .
-      #     paths:
-      #       - win_cov_*.part
+      - persist_to_workspace:
+          root: .
+          paths:
+            - win_cov_*.part
 
       - store_test_results:
           path: *WIN_TEST_RESULTS
@@ -163,8 +167,7 @@ jobs:
           path: *WIN_TEST_RESULTS
           
 workflows:
-  version: 2
-  test:
+  hcl:
     jobs:
       - linux-tests:
           matrix:
