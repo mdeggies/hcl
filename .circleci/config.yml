@@ -105,8 +105,8 @@ jobs:
     steps: 
       - run: git config --global core.autocrlf false
       - checkout
-      - attach_workspace:
-          at: .
+      # - attach_workspace:
+      #     at: .
       - git-verify
       - run: 
           name: Setup (remove pre-installed go v1.12)
@@ -152,10 +152,10 @@ jobs:
           prefix: "win"
 
       # save coverage report parts
-      - persist_to_workspace:
-          root: .
-          paths:
-            - win_cov_*.part
+      # - persist_to_workspace:
+      #     root: .
+      #     paths:
+      #       - win_cov_*.part
 
       - store_test_results:
           path: *WIN_TEST_RESULTS
