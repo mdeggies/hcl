@@ -129,9 +129,8 @@ jobs:
             fi
 
       - run: 
-          name: Run verification steps
+          name: Go mod download
           command: |
-            make fmt
             go mod verify
             go mod download
   
