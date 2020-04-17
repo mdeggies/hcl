@@ -109,8 +109,8 @@ jobs:
 
       - restore_cache:
           keys:
-            - windows-golang-<< parameters.go-version >>-cachexx
-            - windows-gomod-cache-{{ checksum "go.mod" }}xx
+            - windows-golang-<< parameters.go-version >>-cache-v1
+            - windows-gomod-cache-{{ checksum "go.mod" }}-v1
 
       - run: 
           name: Install go version << parameters.go-version >>
@@ -128,12 +128,12 @@ jobs:
             go mod download
   
       - save_cache:
-          key: windows-golang-<< parameters.go-version >>-cachexx
+          key: windows-golang-<< parameters.go-version >>-cache-v1
           paths:
             - /go
 
       - save_cache:
-          key: windows-gomod-cache-{{ checksum "go.mod" }}xx
+          key: windows-gomod-cache-{{ checksum "go.mod" }}-v1
           paths:
             - c:\Windows\system32\config\systemprofile\go\pkg\mod
 
