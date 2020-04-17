@@ -18,11 +18,6 @@ references:
     WIN_WORKING_DIR: *WIN_WORKING_DIR
     WIN_GOMOD_DIR: *WIN_GOMOD_DIR
 
-executors:
-  go:
-    docker:
-      - image: circleci/golang:1.14
-
 commands:
   git-verify:
     steps:
@@ -36,11 +31,24 @@ commands:
               git status --porcelain
               exit 1
             fi
-
+            
+  run-gotests:
+    parameters:
+      cmd:
+        type: string
+    steps:
+      - run:
+          name: "Run go tests"
+          command: |
+            PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
+            echo "Running $(echo $PACKAGE_NAMES | wc -w) packages"
+            echo $PACKAGE_NAMES
+            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=linux_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
+        
 jobs:
   go-checks:
-    executor:
-      name: go
+    docker:
+      - image: circleci/golang:<< parameters.go-version >>
     environment: 
       <<: *ENVIRONMENT
     steps:
@@ -49,21 +57,18 @@ jobs:
       - run: make fmt
       - git-verify
 
-  go-test:
-    executor:
-      name: go
+  linux-tests:
+    docker:
+      - image: circleci/golang:<< parameters.go-version >>
+    environment: 
+      <<: *ENVIRONMENT
     steps:
       - checkout
       - attach_workspace:
           at: .
       - run: mkdir -p $TEST_RESULTS_DIR
-      - run:
-          name: Run Go Tests
-          command: |
-            PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
-            echo "Running $(echo $PACKAGE_NAMES | wc -w) packages"
-            echo $PACKAGE_NAMES
-            gotestsum --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=linux_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
+      - run-gotests:
+          cmd: "gotestsum"
 
       # save coverage report parts
       - persist_to_workspace:
@@ -95,7 +100,7 @@ jobs:
           at: .
       - git-verify
       - run: 
-          name: Setup (remove pre-installed go)
+          name: Setup (remove pre-installed go v1.12)
           command: |
             rm -rf "c:\Go"
             mkdir -p $TEST_RESULTS_DIR
@@ -133,14 +138,9 @@ jobs:
             curl --fail --location https://github.com/gotestyourself/gotestsum/releases/download/v<< parameters.gotestsum-version >>/gotestsum_<< parameters.gotestsum-version >>_windows_amd64.tar.gz --output gotestsum.tar.gz
             tar -xvzf gotestsum.tar.gz
 
-      - run:
-          name: Run go tests
-          command: |
-            PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
-            echo "Running $(echo $PACKAGE_NAMES | wc -w) packages"
-            echo $PACKAGE_NAMES
-            ./gotestsum.exe --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=win_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
-      
+      - run-gotests:
+          cmd: "./gotestsum.exe"
+
       # save coverage report parts
       - persist_to_workspace:
           root: .
@@ -156,10 +156,14 @@ workflows:
   version: 2
   test:
     jobs:
-      - go-test
+      - linux-tests:
+          matrix:
+            parameters:
+              go-version: ["1.14"]
+          name: linux-test-go-<< matrix.go-version >>
       - win-tests:
           matrix:
             parameters:
-              go-version: ["1.14.1"]
+              go-version: ["1.14"]
               gotestsum-version: ["0.4.1"]
           name: win-test-go-<< matrix.go-version >>
