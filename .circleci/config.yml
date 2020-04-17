@@ -36,6 +36,8 @@ commands:
     parameters:
       cmd:
         type: string
+      prefix:
+        type: string
     steps:
       - run:
           name: "Run go tests"
@@ -43,7 +45,7 @@ commands:
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             echo "Running $(echo $PACKAGE_NAMES | wc -w) packages"
             echo $PACKAGE_NAMES
-            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=linux_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
+            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.prefix >>_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
         
 jobs:
   go-checks:
@@ -75,6 +77,7 @@ jobs:
       - run: mkdir -p $TEST_RESULTS_DIR
       - run-gotests:
           cmd: "gotestsum"
+          prefix: "linux"
 
       # save coverage report parts
       - persist_to_workspace:
@@ -146,6 +149,7 @@ jobs:
 
       - run-gotests:
           cmd: "./gotestsum.exe"
+          prefix: "win"
 
       # save coverage report parts
       - persist_to_workspace:
