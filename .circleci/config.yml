@@ -162,6 +162,11 @@ jobs:
 workflows:
   hcl:
     jobs:
+      - go-checks:
+          matrix:
+            parameters:
+              go-version: ["1.14"]
+          name: go-checks-<< matrix.go-version >>
       - linux-tests:
           requires:
             - go-checks
