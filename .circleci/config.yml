@@ -70,11 +70,11 @@ jobs:
       - run: mkdir -p $TEST_RESULTS_DIR
       - attach_workspace:
           at: $TEST_RESULTS_DIR
-      - run: cat $TEST_RESULTS_DIR/linux_coverage_*.part
+      - run: cat $TEST_RESULTS_DIR/linux_coverage_*.part 2>/dev/null
       - run-gotests:
           cmd: "gotestsum"
           platform: "linux"
-      - run: cat $TEST_RESULTS_DIR/linux_coverage_*.part
+      - run: cat $TEST_RESULTS_DIR/linux_coverage_*.part 2>/dev/null
 
       - persist_to_workspace:
           root: $TEST_RESULTS_DIR
