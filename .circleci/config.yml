@@ -38,7 +38,7 @@ commands:
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             echo "Running $(echo $PACKAGE_NAMES | wc -w) packages"
             echo $PACKAGE_NAMES
-            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.platform >>_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
+            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.platform >>_coverage_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
         
 jobs:
   go-checks:
@@ -107,7 +107,7 @@ jobs:
           name: Setup (remove pre-installed go v1.12)
           command: |
             rm -rf "c:\Go"
-            mkdir -p $TEST_RESULTS_DIR/hcl
+            mkdir -p $TEST_RESULTS_DIR
 
       - restore_cache:
           keys:
@@ -150,13 +150,12 @@ jobs:
           platform: "win"
 
       - run: cat win_cov_*.part
-      - run: cat "c:\Users\circleci\AppData\Local\Temp\test-results\win_cov_*.part"
 
       # Save coverage report parts
       - persist_to_workspace:
           root: .
           paths:
-            - c:\Users\circleci\AppData\Local\Temp\test-results\win_cov_*.part
+            - win_cov_*.part
 
       - store_test_results:
           path: *WIN_TEST_RESULTS
