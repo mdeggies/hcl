@@ -79,7 +79,7 @@ jobs:
       - persist_to_workspace:
           root: $TEST_RESULTS_DIR
           paths:
-            - $TEST_RESULTS_DIR/linux_coverage_*.part
+            - linux_coverage_*.part
 
       - store_test_results:
           path: *TEST_RESULTS_DIR
