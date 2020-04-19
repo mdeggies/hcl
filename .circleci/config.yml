@@ -38,7 +38,7 @@ commands:
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             echo "Running $(echo $PACKAGE_NAMES | wc -w) packages"
             echo $PACKAGE_NAMES
-            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.platform >>_coverage_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
+            << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/gotestsum-report.xml -- -p 2 -cover -coverprofile=$TEST_RESULTS_DIR/<< parameters.platform >>_coverage_.part $PACKAGE_NAMES
         
 jobs:
   go-checks:
@@ -67,19 +67,19 @@ jobs:
         type: string
     steps:
       - checkout
-      - attach_workspace:
-          at: .
+      # - attach_workspace:
+      #     at: .
       - run: mkdir -p $TEST_RESULTS_DIR
       - run-gotests:
           cmd: "gotestsum"
           platform: "linux"
-      - run: cat linux_coverage_*.part
+      - run: cat $TEST_RESULTS_DIR/linux_coverage_*.part
 
       # Save coverage report parts
-      - persist_to_workspace:
-          root: .
-          paths:
-            - linux_coverage_*.part
+      # - persist_to_workspace:
+      #     root: .
+      #     paths:
+      #       - linux_coverage_*.part
 
       - store_test_results:
           path: *TEST_RESULTS_DIR
@@ -177,11 +177,11 @@ workflows:
             parameters:
               go-version: ["1.14"]
           name: linux-test-go-<< matrix.go-version >>
-      - win-tests:
-          requires:
-            - go-checks
-          matrix:
-            parameters:
-              go-version: ["1.14"]
-              gotestsum-version: ["0.4.1"]
-          name: win-test-go-<< matrix.go-version >>
+      # - win-tests:
+      #     requires:
+      #       - go-checks
+      #     matrix:
+      #       parameters:
+      #         go-version: ["1.14"]
+      #         gotestsum-version: ["0.4.1"]
+      #     name: win-test-go-<< matrix.go-version >>
