@@ -69,7 +69,7 @@ jobs:
       - checkout
       - run: mkdir -p $TEST_RESULTS_DIR
       - attach_workspace:
-          at: $TEST_RESULTS_DIR
+          at: *TEST_RESULTS_DIR
       # - run: cat $TEST_RESULTS_DIR/linux_coverage_*.part 2>/dev/null
       - run-gotests:
           cmd: "gotestsum"
@@ -77,7 +77,7 @@ jobs:
       - run: cat $TEST_RESULTS_DIR/linux_coverage_*.part 2>/dev/null
 
       - persist_to_workspace:
-          root: $TEST_RESULTS_DIR
+          root: *TEST_RESULTS_DIR
           paths:
             - linux_coverage_*.part
 
