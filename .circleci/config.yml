@@ -67,19 +67,19 @@ jobs:
         type: string
     steps:
       - checkout
-      # - attach_workspace:
-      #     at: .
       - run: mkdir -p $TEST_RESULTS_DIR
+      - attach_workspace:
+          at: $TEST_RESULTS_DIR
+      - run: cat $TEST_RESULTS_DIR/linux_coverage_*.part
       - run-gotests:
           cmd: "gotestsum"
           platform: "linux"
       - run: cat $TEST_RESULTS_DIR/linux_coverage_*.part
 
-      # Save coverage report parts
-      # - persist_to_workspace:
-      #     root: .
-      #     paths:
-      #       - linux_coverage_*.part
+      - persist_to_workspace:
+          root: $TEST_RESULTS_DIR
+          paths:
+            - $TEST_RESULTS_DIR/linux_coverage_*.part
 
       - store_test_results:
           path: *TEST_RESULTS_DIR
