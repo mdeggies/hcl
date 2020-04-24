@@ -43,7 +43,7 @@ commands:
 jobs:
   go-checks:
     docker:
-      - image: cbarraford:golang-ruby
+      - image: docker.io/cbarraford/golang-ruby:latest
     environment: 
       <<: *ENVIRONMENT
     working_directory: ~/go/src/github.com/hashicorp/hcl
