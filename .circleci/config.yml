@@ -41,22 +41,22 @@ commands:
             << parameters.cmd >> --format=short-verbose --junitfile $TEST_RESULTS_DIR/hcl2/gotestsum-report.xml -- -p 2 -cover -coverprofile=<< parameters.platform >>_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
         
 jobs:
-  go-checks:
-    docker:
-      - image: docker.io/cbarraford/golang-ruby:latest
-    environment: 
-      <<: *ENVIRONMENT
-    working_directory: ~/go/src/github.com/hashicorp/hcl
-    steps:
-      - checkout
-      - run: echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> $BASH_ENV
-      - run: echo $PATH
-      # - run: go install
-      - run: make updatedeps
-      - run: go mod vendor
-      - run: go mod verify
-      - run: make fmt
-      - git-verify
+  # go-checks:
+  #   docker:
+  #     - image: docker.io/cbarraford/golang-ruby:latest
+  #   environment: 
+  #     <<: *ENVIRONMENT
+  #   working_directory: ~/go/src/github.com/hashicorp/hcl
+  #   steps:
+  #     - checkout
+  #     - run: echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> $BASH_ENV
+  #     - run: echo $PATH
+  #     # - run: go install
+  #     - run: make updatedeps
+  #     - run: go mod vendor
+  #     - run: go mod verify
+  #     - run: make fmt
+  #     - git-verify
 
   linux-tests:
     docker:
@@ -165,19 +165,19 @@ jobs:
 workflows:
   hcl2:
     jobs:
-      - go-checks
+      # - go-checks
       - linux-tests:
           matrix:
             parameters:
               go-version: ["1.14"]
           name: linux-test-go-<< matrix.go-version >>
-          requires:
-            - go-checks
+          # requires:
+          #   - go-checks
       - win-tests:
           matrix:
             parameters:
               go-version: ["1.14"]
               gotestsum-version: ["0.4.1"]
           name: win-test-go-<< matrix.go-version >>
-          requires:
-            - go-checks
+          # requires:
+          #   - go-checks
