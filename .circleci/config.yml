@@ -57,8 +57,8 @@ jobs:
       - checkout
       - run: echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> $BASH_ENV
       - run: echo $PATH
-      # - run: make updatedeps
-      - run: go mod vendor
+      - run: make updatedeps
+      # - run: go mod vendor
       - run: go mod verify
       - run: make fmt
       - git-verify
