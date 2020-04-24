@@ -48,7 +48,7 @@ jobs:
     environment: 
       <<: *ENVIRONMENT
     parameters:
-      go-verison:
+      go-version:
         type: string
       ruby-version:
         type: string
