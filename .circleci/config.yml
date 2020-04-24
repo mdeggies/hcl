@@ -56,7 +56,7 @@ jobs:
       - checkout
       - run: export PATH=$PATH:$(go env GOPATH)/bin
       # - run: make updatedeps
-      - run: go install -mod=vendor .
+      - run: go mod vendor
       - run: go mod verify
       - run: make fmt
       - git-verify
