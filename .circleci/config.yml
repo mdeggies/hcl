@@ -53,7 +53,7 @@ jobs:
       - run: echo $PATH
       # - run: go install
       - run: make updatedeps
-      # - run: go mod vendor
+      - run: go mod vendor
       - run: go mod verify
       - run: make fmt
       - git-verify
