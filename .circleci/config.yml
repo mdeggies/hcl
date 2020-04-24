@@ -53,6 +53,8 @@ jobs:
       - run: echo $PATH
       # - run: go install
       - run: make updatedeps
+      - run: which ragel
+      - run: command -v ragel
       # - run: go mod vendor
       - run: go mod verify
       - run: make fmt
