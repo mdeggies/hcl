@@ -55,7 +55,7 @@ jobs:
     steps:
       - checkout
       - run: export PATH=$PATH:$(go env GOPATH)/bin
-      - run: make updatedeps
+      # - run: make updatedeps
       - run: go mod verify
       - run: make fmt
       - git-verify
