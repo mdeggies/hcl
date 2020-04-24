@@ -94,7 +94,6 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - git-verify
       - run: 
           name: Setup (remove pre-installed go v1.12)
           command: |
