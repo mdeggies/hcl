@@ -12,19 +12,6 @@ references:
     WIN_TEST_RESULTS: &WIN_TEST_RESULTS c:\Users\circleci\AppData\Local\Temp\test-results
 
 commands:
-  git-verify:
-    steps:
-      - run: 
-          name: "Verify no code was generated"
-          command: |
-            if [[ -z $(git status --porcelain) ]]; then
-              echo "Git directory is clean."
-            else
-              echo "Git is dirty. Run `make fmt` and `make generate` locally and commit any formatting fixes or generated code."
-              git status --porcelain
-              exit 1
-            fi
-
   run-gotests:
     parameters:
       cmd:
@@ -49,13 +36,17 @@ jobs:
     working_directory: ~/go/src/github.com/hashicorp/hcl
     steps:
       - checkout
-      # - run: echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> $BASH_ENV
-      # - run: echo $PATH
-      # - run: make updatedeps
-      - run: apk add ragel
-      - run: go mod verify
-      - run: make fmt
-      - git-verify
+      - run: 
+          name: Install dependencies
+          command: | 
+            apk add ragel
+            go get -u golang.org/x/tools/cmd/stringer
+      - run: 
+          name: Run go checks 
+          command: |
+            go mod verify 
+            go fmt ./...
+            go generate ./...
 
   linux-tests:
     docker:
