@@ -49,13 +49,10 @@ jobs:
     working_directory: ~/go/src/github.com/hashicorp/hcl
     steps:
       - checkout
-      - run: echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> $BASH_ENV
-      - run: echo $PATH
-      # - run: go install
+      # - run: echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> $BASH_ENV
+      # - run: echo $PATH
       - run: make updatedeps
-      - run: which ragel
-      - run: command -v ragel
-      # - run: go mod vendor
+      - run: apk add ragel
       - run: go mod verify
       - run: make fmt
       - git-verify
