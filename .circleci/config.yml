@@ -43,10 +43,13 @@ commands:
 jobs:
   go-checks:
     docker:
+      - image: circleci/golang:<< parameters.go-version >>
       - image: circleci/ruby:<< parameters.ruby-version >>
     environment: 
       <<: *ENVIRONMENT
     parameters:
+      go-verison:
+        type: string
       ruby-version:
         type: string
     steps:
@@ -167,8 +170,9 @@ workflows:
       - go-checks:
           matrix:
             parameters:
+              go-version: ["1.14"]
               ruby-version: ["2.7"]
-          name: go-checks-<< matrix.ruby-version >>
+          name: go-checks-<< matrix.go-version >>
       - linux-tests:
           matrix:
             parameters:
