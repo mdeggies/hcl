@@ -52,7 +52,7 @@ jobs:
       - run: echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> $BASH_ENV
       - run: echo $PATH
       # - run: go install
-      # - run: make updatedeps
+      - run: make updatedeps
       # - run: go mod vendor
       - run: go mod verify
       - run: make fmt
